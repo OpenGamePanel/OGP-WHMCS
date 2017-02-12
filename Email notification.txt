@@ -1,0 +1,20 @@
+In order to inform to the client when a new service is created you can create an email template.
+Go to Setup -> Email Templates, and create a new template (Form at top):
+
+Create New Email Template     Type: Product     Unique Name: OGP Account Welcome Email
+
+This is a content example:
+----------------------------------------------------------------------------------------------------
+Hello {$client_name},
+
+Your account has been created, now you can login to our panel with the next login information:
+
+Control panel URL: {$ogp_site}
+Username: {$ogp_user}
+Password: {$service_password}
+
+Thanks for your purchase.
+----------------------------------------------------------------------------------------------------
+
+ADVICE:
+Note that "Unique Name" must be wrote as is, and it is case sensitive.
