@@ -300,10 +300,14 @@ if(isset($_POST['adminlogin']) and isset($_POST['adminpassword']))
 					}
 					elseif($_POST['installation'] == "manual")
 					{
+						require(MODULES."config_games/server_config_parser.php");
+						$server_xml = read_server_config(SERVER_CONFIG_LOCATION."/".$home_info['home_cfg_file']);
+						
 						if($_POST['url'] != "")
 						{
+							$postInstallCMD = "\nchattr +i " . $home_info['home_path'] . "/" . ($server_xml->exe_location ? $server_xml->exe_location . "/" : "") . $server_xml->server_exec_name;
 							$filename = basename($_POST['url']);
-							$remote->start_file_download($_POST['url'],$home_info['home_path'],$filename,"uncompress");
+							$remote->start_file_download($_POST['url'],$home_info['home_path'],$filename,"uncompress",$postInstallCMD);
 						}
 						else
 							error('The URL for manual installation is empty.');
