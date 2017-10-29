@@ -305,7 +305,7 @@ if(isset($_POST['adminlogin']) and isset($_POST['adminpassword']))
 						
 						if($_POST['url'] != "")
 						{
-							$postInstallCMD = "\nchattr +i " . $home_info['home_path'] . "/" . ($server_xml->exe_location ? $server_xml->exe_location . "/" : "") . $server_xml->server_exec_name;
+							$postInstallCMD = "\n{OGP_LOCK_FILE} " . $home_info['home_path'] . "/" . ($server_xml->exe_location ? $server_xml->exe_location . "/" : "") . $server_xml->server_exec_name;
 							$filename = basename($_POST['url']);
 							$remote->start_file_download($_POST['url'],$home_info['home_path'],$filename,"uncompress",$postInstallCMD);
 						}
