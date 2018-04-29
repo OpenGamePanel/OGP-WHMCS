@@ -198,13 +198,22 @@ if(isset($_POST['adminlogin']) and isset($_POST['adminpassword']))
 					$game_path = "/home/".$rserver['ogp_user']."/OGP_User_Files/whmcs/";
 					$home_id = $db->addGameHome($_POST['rserver_id'], $user_id, $home_cfg_id, $game_path, $hostname, $_POST['server_rcon'], $_POST['ftp_passwd']);
 					if($_POST['force_ip'] != "")
+					{
 						$ip_id = $db->getIpIdByIp($_POST['force_ip']);
+						$port = $db->getNextAvailablePort($ip_id,$home_cfg_id);
+					}
 					else
 					{
 						$remote_server_ips = $db->getRemoteServerIPs($_POST['rserver_id']);
-						$ip_id = $remote_server_ips['0']['ip_id'];
+						foreach($remote_server_ips As $ip_info)
+						{
+							$ip_id = $ip_info['ip_id'];
+							$port = $db->getNextAvailablePort($ip_id,$home_cfg_id);
+							If($port){
+								break;
+							}
+						}
 					}
-					$port = $db->getNextAvailablePort($ip_id,$home_cfg_id);
 					$db->addGameIpPort($home_id, $ip_id, $port);
 					$mod_id = $db->addModToGameHome($home_id, $mod_cfg_id);
 					$db->updateGameModParams($_POST['maxplayers'], "", "NA", "0", $home_id, $mod_cfg_id);
