@@ -55,6 +55,7 @@ function send_request($panel_url,$method,$postfields) {
 	curl_setopt($c, CURLOPT_RETURNTRANSFER, true);
 	curl_setopt($c, CURLOPT_POSTFIELDS,     $postfields );
 	curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
+	curl_setopt($c, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_0);
 	$result = curl_exec($c);
 	
 	if($result === false) {
