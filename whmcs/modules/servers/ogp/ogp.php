@@ -273,14 +273,20 @@ function ogp_ChangePassword($params) {
 
 function ogp_ChangePackage($params) {
 
-	# Code to perform action goes here...
+	$configoptions = $params["configoptions"];
 
-	if ($successful) {
-		$result = "success";
-	} else {
-		$result = "Not Implemented Yet...";
-	}
-	return $result;
+    $postfields['adminlogin'] = $params["serverusername"];
+    $postfields['adminpassword'] = $params["serverpassword"];
+    $postfields['serviceid'] = $params["serviceid"];
+    $postfields['maxplayers'] = $configoptions[co_slots];
+
+    $response = send_request($params["configoption1"], 'changepackage', $postfields);
+    if (is_array($response)) {
+        $result = "success";
+    } else {
+        $result = $response;
+    }
+    return $result;
 
 }
 
