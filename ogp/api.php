@@ -614,6 +614,60 @@ if(isset($_POST['adminlogin']) and isset($_POST['adminpassword']))
 				result(true);
 			}
 		}
+		elseif(isset($_POST['changepackage']))
+		{
+            $whmcs_service = $db->resultQuery("SELECT * FROM `OGP_DB_PREFIXwhmcs` WHERE `serviceid`=" . (int)$_POST['serviceid']);
+            if (is_array($whmcs_service['0'])) {
+                $user_id = $whmcs_service['0']['user_id'];
+                $home_id = $whmcs_service['0']['home_id'];
+                if ($home_id < 0) {
+                    $sid = $home_id * (-1);
+                    $ts3_home_id = $whmcs_service['0']['ip_id'];
+                    $ts3 = $db->resultQuery("SELECT * FROM OGP_DB_PREFIXts3_homes WHERE `vserver_id`=$sid AND `user_id`=$user_id;");
+                    if (!$ts3) {
+                        error("TS3 Virtual server with id $sid is not assigned to user id $user_id.");
+                    } else {
+                        $ts3_info = $ts3[0];
+                        $ts3_home_info = $db->getGameHome($ts3_home_id);
+                        require_once("protocol/TeamSpeak3/TeamSpeak3.php");
+                        $cfg["user"] = "serveradmin";
+                        $cfg["pass"] = $ts3_home_info['control_password'];
+                        $cfg["query"] = "10011";
+                        if ($ts3_home_info['use_nat'] == 1) {
+                            $cfg["host"] = $ts3_home_info['agent_ip'];
+                        } else {
+                            $cfg["host"] = $ts3_info['ip'];
+                        }
+                        try {
+                            $ts3_ServerInstance = TeamSpeak3::factory("serverquery://".$cfg["user"].":".
+                                                                                       $cfg["pass"]."@".
+                                                                                       $cfg["host"].":".
+                                                                                       $cfg["query"]."/");
+                            $ts3_ServerInstance->serverGetById($sid)->modify(array("virtualserver_maxclients" => $_POST['maxplayers']));
+                            result(true);
+                        } catch (Exception $e) {
+                            error("Error ".$e->getCode().": ".$e->getMessage());
+                        }
+                    }
+                } else {
+                    $home_info = $db->getGameHome($home_id);
+                    if (!$home_info) {
+                        error("The server for this service has been removed manually.");
+                    } else {
+                        if (isset($home_info['mods']) && is_array($home_info['mods'])) {
+                            foreach ($home_info['mods'] as $mod_info) {
+                                $db->updateGameModParams($_POST['maxplayers'], $mod_info['extra_params'], $mod_info['cpu_affinity'], $mod_info['nice'], $home_id, $mod_info['mod_cfg_id']);
+                            }
+                            result(true);
+                        } else {
+                            error("No mods found for this game server.");
+                        }
+                    }
+                }
+            } else {
+                error("Service id $_POST[serviceid] does not exists in OGP database.");
+            }
+        }
 	}
 }
 else
